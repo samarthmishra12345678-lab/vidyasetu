@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Privacy Policy | VidyaSetu</title>
+  <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+  <link rel="stylesheet" href="/styles.css" />
+</head>
+<body>
+  <header class="topbar">
+    <div class="topbar-inner">
+      <a class="brand" href="/">
+        <span class="brand-mark" aria-hidden="true">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#10B981" stroke-width="2.5" stroke-linecap="square">
+            <path d="M5 13l4.5 4.5L19 7"/>
+          </svg>
+        </span>
+        <span class="brand-title">VidyaSetu</span>
+      </a>
+      <div class="top-actions">
+        <a class="btn btn-outline" href="/">Back to Application</a>
+      </div>
+    </div>
+  </header>
+
+  <main class="container">
+    <article class="legal-doc">
+      <h1>Privacy Policy</h1>
+      <p class="subtext">Last updated: October 26, 2026</p>
+
+      <h2>1. Data Minimization &amp; Zero Account Wall</h2>
+      <p>VidyaSetu operates without user registration, passwords, advertising trackers, or third-party analytics scripts. You do not need to submit your name, phone number, email address, or school identifier to check a draft or build a citation.</p>
+
+      <h2>2. How Draft and Source Text Is Processed</h2>
+      <ul>
+        <li>When you click <strong>Check Originality</strong>, the draft and reference text you paste are sent over HTTPS to <code>POST /api/check</code> solely to compute similarity scores and flagged sentences in memory.</li>
+        <li>VidyaSetu does <strong>not</strong> write submitted drafts, source passages, or citation fields to any persistent database, log file, or external third-party service.</li>
+        <li>No draft text ever leaves the server memory except back to your own browser tab as the report.</li>
+        <li>Avoid pasting private personal data, unpublished exam content, or another person's private work into the text boxes.</li>
+      </ul>
+
+      <h2>3. Citation, Planner, and Local Browser Storage</h2>
+      <ul>
+        <li>Citation fields are processed in memory by <code>POST /api/cite</code> and are never stored server-side.</li>
+        <li>Your assignment checklist is stored strictly inside your own browser under the local key <code>vidyasetu_plan_tasks</code>.</li>
+        <li>Your saved reference list stays in your browser under the local key <code>vidyasetu_refs</code>.</li>
+        <li>Audio read-aloud uses your browser's built-in <code>window.speechSynthesis</code> engine locally on your device.</li>
+      </ul>
+      <p>
+        <button class="btn btn-outline" onclick="localStorage.removeItem('vidyasetu_plan_tasks'); localStorage.removeItem('vidyasetu_refs'); document.getElementById('clear-msg').textContent = 'Local checklist and reference storage cleared from this browser.';">
+          Clear My Local Browser Checklist Data
+        </button>
+        <span id="clear-msg" style="margin-left:10px; font-size:13px; color:#0f766e; font-weight:600;"></span>
+      </p>
+
+      <h2>4. Study Exchange Board Entries</h2>
+      <p>Entries submitted to <code>POST /api/board</code> are visible to other visitors during active server sessions and are sanitized to strip HTML tags. Do not post private phone numbers, addresses, or anyone else's unpublished work on public entries. Board memory resets whenever the server restarts, so treat the board as a session notice board rather than a permanent archive.</p>
+
+      <h2>5. Contact &amp; Data Inquiries</h2>
+      <p>For questions regarding privacy practices or repository maintenance, contact the project maintainer via the official VidyaSetu repository issue tracker.</p>
+    </article>
+  </main>
+
+  <footer class="site-footer">
+    <div class="footer-inner">
+      <div><strong>VidyaSetu</strong> &middot; Student Writing &amp; Deadline Companion &middot; IceHacks 2026</div>
+      <nav class="footer-links">
+        <a href="/">Home</a>
+        <a href="/privacy.html">Privacy Policy</a>
+        <a href="/terms.html">Terms &amp; Conditions</a>
+      </nav>
+    </div>
+  </footer>
+</body>
+</html>

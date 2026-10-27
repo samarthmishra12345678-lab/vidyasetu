@@ -1,0 +1,24 @@
+{
+  "name": "vidyasetu",
+  "version": "1.0.0",
+  "description": "VidyaSetu: Originality Checker, Citation Builder, Assignment Planner, and Study Exchange Board.",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js",
+    "dev": "node server.js",
+    "test": "node test_suite.mjs"
+  },
+  "engines": {
+    "node": ">=18.0.0"
+  },
+  "keywords": [
+    "education",
+    "originality-check",
+    "citation-builder",
+    "assignment-planner",
+    "full-stack",
+    "nodejs"
+  ],
+  "author": "Samarth Mishra",
+  "license": "MIT"
+}

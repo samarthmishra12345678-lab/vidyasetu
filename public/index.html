@@ -1,0 +1,342 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>VidyaSetu | Originality Check, Citation Builder &amp; Assignment Planner</title>
+  <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+  <link rel="stylesheet" href="/styles.css" />
+</head>
+<body>
+  <header class="topbar">
+    <div class="topbar-inner">
+      <a class="brand" href="/">
+        <span class="brand-mark" aria-hidden="true">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#10B981" stroke-width="2.5" stroke-linecap="square">
+            <path d="M5 13l4.5 4.5L19 7"/>
+          </svg>
+        </span>
+        <span class="brand-title">VidyaSetu</span>
+      </a>
+
+      <div class="top-actions">
+        <button class="status-tag" onclick="toggleApiDrawer()" title="Inspect raw backend API response">
+          <span class="status-indicator"></span>
+          <span id="api-telemetry">API Online</span>
+        </button>
+        <a class="btn btn-outline" href="/privacy.html">Privacy</a>
+        <a class="btn btn-outline" href="/terms.html">Terms</a>
+      </div>
+    </div>
+  </header>
+
+  <main class="container">
+    <section class="intro-header">
+      <div class="intro-kicker">Student Writing &amp; Deadline Companion</div>
+      <h1>Check originality, build citations, and plan assignments before the deadline.</h1>
+      <p>VidyaSetu compares your draft against reference sources you provide, formats citations in APA, MLA, and IEEE styles, turns a word count and due date into a day-by-day work plan, and hosts a student exchange board for peer feedback requests. Zero accounts, zero trackers, zero external API keys.</p>
+      <div class="stats-strip">
+        <div class="stat"><strong>5</strong><span>Working modules</span></div>
+        <div class="stat"><strong>3</strong><span>Citation styles</span></div>
+        <div class="stat"><strong>6</strong><span>Sources per check</span></div>
+        <div class="stat"><strong>0</strong><span>Trackers or accounts</span></div>
+        <div class="stat"><strong>100%</strong><span>Runs in your browser</span></div>
+      </div>
+    </section>
+
+    <section class="api-drawer" id="api-drawer">
+      <div class="card">
+        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:8px;">
+          <strong style="font-size:13px;">Live Backend API Response Inspector</strong>
+          <button class="btn btn-outline" style="padding:4px 10px; font-size:12px;" onclick="toggleApiDrawer()">Close</button>
+        </div>
+        <pre class="code-block" id="api-json-preview">Waiting for API request...</pre>
+      </div>
+    </section>
+
+    <nav class="tabs" aria-label="Application Tools">
+      <button class="tab-btn active" onclick="switchTab('check', this)">
+        Originality Check
+        <span>POST /api/check</span>
+      </button>
+      <button class="tab-btn" onclick="switchTab('cite', this)">
+        Citation Builder
+        <span>POST /api/cite</span>
+      </button>
+      <button class="tab-btn" onclick="switchTab('plan', this)">
+        Assignment Planner
+        <span>POST /api/plan</span>
+      </button>
+      <button class="tab-btn" onclick="switchTab('guide', this)">
+        Integrity Guide
+        <span>Client reference</span>
+      </button>
+      <button class="tab-btn" onclick="switchTab('board', this)">
+        Study Exchange Board
+        <span>GET &amp; POST /api/board</span>
+      </button>
+    </nav>
+
+    <!-- PANEL 1: ORIGINALITY CHECK -->
+    <section id="panel-check" class="panel active">
+      <div class="grid-2">
+        <div class="card">
+          <h3>Paste Your Draft and Reference Sources</h3>
+          <p class="subtext">Load a sample below, or paste your own draft. Separate multiple sources with lines starting with <code>SOURCE: Title</code>:</p>
+          <div class="preset-row">
+            <button class="preset-btn" onclick="loadCheckSample('overlap')">Sample: Overlapping Draft</button>
+            <button class="preset-btn" onclick="loadCheckSample('clean')">Sample: Original Draft</button>
+          </div>
+          <label class="field-label" for="check-draft">Your Draft</label>
+          <textarea id="check-draft" rows="7" oninput="updateDraftStats()" placeholder="Paste the paragraph you want to verify..."></textarea>
+          <div class="stats-strip stats-strip-inline" id="draft-stats">
+            <div class="stat"><strong id="stat-words">0</strong><span>words</span></div>
+            <div class="stat"><strong id="stat-sentences">0</strong><span>sentences</span></div>
+            <div class="stat"><strong id="stat-readtime">0</strong><span>min read</span></div>
+            <div class="stat"><strong id="stat-avg">0</strong><span>avg words/sentence</span></div>
+          </div>
+          <label class="field-label" for="check-sources">Reference Sources</label>
+          <textarea id="check-sources" rows="7" placeholder="SOURCE: Memory Science Overview&#10;Paste source text here..."></textarea>
+          <div style="display:flex; gap:8px; flex-wrap:wrap;">
+            <button class="btn btn-primary" onclick="runCheckApi()">Check Originality</button>
+            <button class="btn btn-outline" onclick="speakResults()">Read Aloud (Audio)</button>
+            <button class="btn btn-outline" onclick="downloadReport()">Download Report</button>
+          </div>
+        </div>
+
+        <div class="card">
+          <h3>Structured Similarity Report</h3>
+          <p class="subtext">Processed via backend endpoint <code>POST /api/check</code>:</p>
+          <div id="check-priority"></div>
+          <div id="check-output"></div>
+        </div>
+      </div>
+    </section>
+
+    <!-- PANEL 2: CITATION BUILDER -->
+    <section id="panel-cite" class="panel">
+      <div class="grid-2">
+        <div class="card">
+          <h3>Source Details</h3>
+          <p class="subtext">Pick a style and source type, fill the fields, and generate a formatted citation via <code>POST /api/cite</code>:</p>
+
+          <div class="field-row">
+            <div>
+              <label class="field-label" for="cite-style">Citation Style</label>
+              <select id="cite-style">
+                <option value="apa">APA 7</option>
+                <option value="mla">MLA 9</option>
+                <option value="ieee">IEEE</option>
+              </select>
+            </div>
+            <div>
+              <label class="field-label" for="cite-type">Source Type</label>
+              <select id="cite-type" onchange="runCiteApi()">
+                <option value="website">Website</option>
+                <option value="article">Journal Article</option>
+                <option value="book">Book</option>
+                <option value="video">Video</option>
+              </select>
+            </div>
+          </div>
+
+          <div class="field-row">
+            <div>
+              <label class="field-label" for="cite-author">Author / Creator</label>
+              <input id="cite-author" value="Rao, Ananya" placeholder="e.g., Rao, Ananya" maxlength="200" />
+            </div>
+            <div>
+              <label class="field-label" for="cite-year">Year</label>
+              <input id="cite-year" value="2025" placeholder="e.g., 2025" maxlength="200" />
+            </div>
+          </div>
+
+          <label class="field-label" for="cite-title">Title</label>
+          <input id="cite-title" value="How Teenagers Actually Study" placeholder="Page, article, or book title" maxlength="200" />
+
+          <div class="field-row">
+            <div>
+              <label class="field-label" for="cite-site">Website / Journal / Publisher Site</label>
+              <input id="cite-site" value="EduJournal" placeholder="e.g., EduJournal" maxlength="200" />
+            </div>
+            <div>
+              <label class="field-label" for="cite-journal">Journal Name (articles)</label>
+              <input id="cite-journal" placeholder="e.g., Journal of Learning Research" maxlength="200" />
+            </div>
+          </div>
+
+          <div class="field-row">
+            <div>
+              <label class="field-label" for="cite-volume">Volume (articles)</label>
+              <input id="cite-volume" placeholder="e.g., 14" maxlength="200" />
+            </div>
+            <div>
+              <label class="field-label" for="cite-issue">Issue (articles)</label>
+              <input id="cite-issue" placeholder="e.g., 2" maxlength="200" />
+            </div>
+          </div>
+
+          <div class="field-row">
+            <div>
+              <label class="field-label" for="cite-pages">Pages (articles)</label>
+              <input id="cite-pages" placeholder="e.g., 45-62" maxlength="200" />
+            </div>
+            <div>
+              <label class="field-label" for="cite-publisher">Publisher (books)</label>
+              <input id="cite-publisher" placeholder="e.g., North Press" maxlength="200" />
+            </div>
+          </div>
+
+          <div class="field-row">
+            <div>
+              <label class="field-label" for="cite-city">City (books)</label>
+              <input id="cite-city" placeholder="e.g., New Delhi" maxlength="200" />
+            </div>
+            <div>
+              <label class="field-label" for="cite-doi">DOI (optional)</label>
+              <input id="cite-doi" placeholder="e.g., 10.1234/example" maxlength="200" />
+            </div>
+          </div>
+
+          <label class="field-label" for="cite-url">URL (web / video)</label>
+          <input id="cite-url" value="https://example.org/teen-study" placeholder="https://..." maxlength="200" />
+
+          <button class="btn btn-primary" onclick="runCiteApi()">Generate Citation</button>
+        </div>
+
+        <div class="card">
+          <h3>Formatted Citation</h3>
+          <p class="subtext">Ready to paste into your reference list, plus in-text citation hints:</p>
+          <div id="cite-output"></div>
+
+          <div class="ref-actions">
+            <button class="btn btn-primary" onclick="addToRefs()">Add to Reference List</button>
+            <button class="btn btn-outline" onclick="copyAllRefs()">Copy All References</button>
+          </div>
+
+          <div class="card-head" style="margin-top:14px;">
+            <h4 style="font-size:13.5px;">My Reference List</h4>
+            <span class="tag-label" id="ref-counter">0/0</span>
+          </div>
+          <div id="ref-list"></div>
+        </div>
+      </div>
+    </section>
+
+    <!-- PANEL 3: ASSIGNMENT PLANNER -->
+    <section id="panel-plan" class="panel">
+      <div class="grid-2">
+        <div class="card">
+          <h3>Assignment Details</h3>
+          <p class="subtext">Turn a word count and deadline into a paced schedule via <code>POST /api/plan</code>:</p>
+
+          <label class="field-label" for="plan-task">Task Name</label>
+          <input id="plan-task" value="Environmental science project report" maxlength="80" />
+
+          <div class="field-row">
+            <div>
+              <label class="field-label" for="plan-words">Word Count</label>
+              <input id="plan-words" type="number" min="100" max="20000" value="1200" />
+            </div>
+            <div>
+              <label class="field-label" for="plan-difficulty">Work Type</label>
+              <select id="plan-difficulty">
+                <option value="standard">Standard writing</option>
+                <option value="research">Research heavy</option>
+                <option value="creative">Creative build</option>
+              </select>
+            </div>
+          </div>
+
+          <div class="field-row">
+            <div>
+              <label class="field-label" for="plan-due">Due Date</label>
+              <input id="plan-due" type="date" />
+            </div>
+            <div>
+              <label class="field-label" for="plan-hours">Daily Study Hours</label>
+              <div class="slider-wrap">
+                <div class="slider-top">
+                  <span>Hours per day</span>
+                  <span id="lbl-plan-hours">2 hrs</span>
+                </div>
+                <input type="range" id="plan-hours" min="1" max="8" step="1" value="2" oninput="previewPlanHours()" onchange="runPlanApi()" />
+              </div>
+            </div>
+          </div>
+
+          <button class="btn btn-primary" onclick="runPlanApi()">Build My Plan</button>
+        </div>
+
+        <div class="card">
+          <h3>Effort Estimate &amp; Day-by-Day Schedule</h3>
+          <p class="subtext">Computed on the backend, saved privately in your browser:</p>
+
+          <div class="score-panel">
+            <div style="font-size:11px; font-weight:700; text-transform:uppercase; color:#52525b;">Estimated Effort</div>
+            <div class="score-value" id="plan-estimate">-- hrs</div>
+            <div id="plan-pace" style="font-size:13px; font-weight:600;">Calculating...</div>
+          </div>
+
+          <div id="plan-schedule"></div>
+
+          <div class="card-head" style="margin-top:14px;">
+            <h4 style="font-size:13.5px;">My Checklist</h4>
+            <span class="tag-label" id="plan-counter">0/0</span>
+          </div>
+          <div id="plan-list"></div>
+        </div>
+      </div>
+    </section>
+
+    <!-- PANEL 4: INTEGRITY GUIDE -->
+    <section id="panel-guide" class="panel">
+      <div class="card">
+        <h3>Citing, Paraphrasing &amp; Submission Reference</h3>
+        <p class="subtext">Select a topic for clear, immediate rules:</p>
+        <div class="aid-grid" id="guide-buttons"></div>
+        <div id="guide-steps"></div>
+      </div>
+    </section>
+
+    <!-- PANEL 5: STUDY EXCHANGE BOARD -->
+    <section id="panel-board" class="panel">
+      <div class="grid-2">
+        <div class="card">
+          <h3>Post a Study Exchange Entry</h3>
+          <p class="subtext">Ask for a citation check, swap sources, or find a study partner:</p>
+          <input type="text" id="post-author" placeholder="Name or Class (e.g., Samarth, Class 11)" maxlength="50" />
+          <select id="post-tag">
+            <option value="Feedback Request">Feedback Request</option>
+            <option value="Citation Swap">Citation Swap</option>
+            <option value="Study Partner">Study Partner</option>
+            <option value="Resource Share">Resource Share</option>
+          </select>
+          <input type="text" id="post-title" placeholder="Entry title" maxlength="110" />
+          <textarea id="post-body" rows="4" placeholder="What do you need, which subject, and by when..." maxlength="280"></textarea>
+          <button class="btn btn-primary" onclick="submitBoardPost()">Post Entry</button>
+        </div>
+
+        <div class="card">
+          <h3>Live Exchange Feed</h3>
+          <p class="subtext">Entries retrieved from <code>GET /api/board</code>:</p>
+          <div id="board-feed"></div>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <footer class="site-footer">
+    <div class="footer-inner">
+      <div><strong>VidyaSetu</strong> &middot; Student Writing &amp; Deadline Companion &middot; IceHacks 2026</div>
+      <nav class="footer-links">
+        <a href="/">Home</a>
+        <a href="/privacy.html">Privacy Policy</a>
+        <a href="/terms.html">Terms &amp; Conditions</a>
+      </nav>
+    </div>
+  </footer>
+
+  <script src="/app.js"></script>
+</body>
+</html>
